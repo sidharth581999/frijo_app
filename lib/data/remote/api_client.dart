@@ -1,9 +1,9 @@
 
 import 'package:dio/dio.dart';
 import 'package:frijo/application/core/serveice/dio_client.dart';
-import 'package:frijo/data/models/branch_model.dart';
+import 'package:frijo/data/models/home_datamodel.dart';
 import 'package:frijo/data/models/login_model.dart';
-import 'package:frijo/data/models/patient_model.dart';
+import 'package:frijo/data/models/category_model.dart';
 import 'package:frijo/data/models/treatment_model.dart';
 import 'package:frijo/domain/core/exception/custom_exception.dart';
 
@@ -13,9 +13,11 @@ class ApiClient {
   static final DioClient _dioClient = DioClient(Dio());
 
   static Future<LoginModel> verifyOtp(String countryCode,String phone) async {
+    print(countryCode); print(phone);
     try {
       final response = await _dioClient.post(
         '/otp_verified',
+        options: Options(extra: {"requiresToken": false}),
         data: {
           'country_code': countryCode,
           'phone': phone

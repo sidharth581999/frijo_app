@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:frijo/data/models/branch_model.dart';
+import 'package:frijo/data/models/home_datamodel.dart';
 import 'package:frijo/domain/usecase/get_home_data.dart';
 import 'package:meta/meta.dart';
 

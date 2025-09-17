@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:frijo/application/core/utils/logger.dart';
+import 'package:frijo/presentation/screens/addFeed/add_feed.dart';
 import 'package:frijo/presentation/screens/home/home.dart';
 import 'package:frijo/presentation/screens/login/login_screen.dart';
 import 'package:frijo/presentation/screens/splash/splash_screen.dart';
@@ -11,7 +12,7 @@ import 'package:page_transition/page_transition.dart';
 class AppRoute {
   // Define all route names here
   static const String splash = '/splash';
-  // static const String settings = '/settings';
+  static const String addFeed = '/add_feed';
   static const String login = '/login';
   static const String home = '/home';
   // static const String register = '/register';
@@ -34,8 +35,8 @@ class AppRoute {
       case home:
         return _pushRoute(settings, HomeScreen());
 
-      // case register:
-      //   return _pushRoute(settings, RegisterScreen());
+      case addFeed:
+        return _pushRoute(settings, AddFeedsScreen());
 
       // case pdfScreen:
       //   return _pushRoute(settings, PdfScreen());

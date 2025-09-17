@@ -15,6 +15,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   FutureOr<void> loginClickedEvent(LoginClickedEvent event, Emitter<LoginState> emit) async{
     emit(LoginClickedState(isLoading: true, isError: false, isSuccess: false, user: null, errorMsg: ""));
     final verifyOtp = VerifyUserOtp.defaultRepo();
+    print(event.countryCode); print(event.phoneNo);
     final response = await verifyOtp.call(countryCode: event.countryCode, phoneNo: event.phoneNo);
     emit(
       response.fold((L){

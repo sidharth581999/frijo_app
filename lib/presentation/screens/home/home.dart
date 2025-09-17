@@ -1,43 +1,18 @@
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frijo/application/core/route/app_route.dart';
+import 'package:frijo/application/core/theme/colors.dart';
+import 'package:frijo/application/core/utils/extentions.dart';
+import 'package:frijo/application/core/utils/text_widget.dart';
+import 'package:frijo/presentation/bloc/homeBloc/home_bloc.dart';
+import 'package:frijo/presentation/screens/home/widgets/home_widgets.dart';
+import 'package:frijo/presentation/widgets/error_widget.dart';
+import 'package:frijo/presentation/widgets/shimmer_loading.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-
-class Feed {
-  final int id;
-  final String description;
-  final String thumbnail;
-  final String videoUrl;
-  final String userName;
-  final String? userImage;
-
-  Feed({
-    required this.id,
-    required this.description,
-    required this.thumbnail,
-    required this.videoUrl,
-    required this.userName,
-    this.userImage,
-  });
-
-  factory Feed.fromJson(Map<String, dynamic> json) {
-    return Feed(
-      id: json['id'],
-      description: json['description'] ?? "",
-      thumbnail: json['image'] ?? "",
-      videoUrl: json['video'] ?? "",
-      userName: json['user']?['name'] ?? "Unknown",
-      userImage: json['user']?['image'],
-    );
-  }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: HomeScreen(),
-  ));
-}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,97 +22,36 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int? playingIndex;
-  ChewieController? _chewieController;
-  VideoPlayerController? _videoPlayerController;
-
-  final categories = ["Explore", "Trending", "All", "Sociology", "Literature"];
-
-  /// Simulated API response
-  final List<Map<String, dynamic>> feedJson = [
-    {
-      "id": 160,
-      "description": "POLITICAL SOCIOLOGY",
-      "image":
-          "https://i.ibb.co/wrzL7vr/Screenshot-2024-11-04-at-2-43-45-PM.png",
-      "video": "https://cdn.noviindus.com/3209829-hd_1280_720_25fps.mp4",
-      "user": {"id": 1, "name": "Frijo", "image": null}
-    },
-    {
-      "id": 160,
-      "description": "POLITICAL SOCIOLOGY",
-      "image":
-          "https://i.ibb.co/wrzL7vr/Screenshot-2024-11-04-at-2-43-45-PM.png",
-      "video": "https://cdn.noviindus.com/3209829-hd_1280_720_25fps.mp4",
-      "user": {"id": 1, "name": "Frijo", "image": null}
-    },
-    {
-      "id": 160,
-      "description": "POLITICAL SOCIOLOGY",
-      "image":
-          "https://i.ibb.co/wrzL7vr/Screenshot-2024-11-04-at-2-43-45-PM.png",
-      "video": "https://cdn.noviindus.com/3209829-hd_1280_720_25fps.mp4",
-      "user": {"id": 1, "name": "Frijo", "image": null}
-    },
-    {
-      "id": 160,
-      "description": "POLITICAL SOCIOLOGY",
-      "image":
-          "https://i.ibb.co/wrzL7vr/Screenshot-2024-11-04-at-2-43-45-PM.png",
-      "video": "https://cdn.noviindus.com/3209829-hd_1280_720_25fps.mp4",
-      "user": {"id": 1, "name": "Frijo", "image": null}
-    },
-    {
-      "id": 159,
-      "description": "GENDER AND SOCIETY",
-      "image":
-          "https://i.ibb.co/wrzL7vr/Screenshot-2024-11-04-at-2-43-45-PM.png",
-      "video": "https://cdn.noviindus.com/3209829-hd_1280_720_25fps.mp4",
-      "user": {"id": 1, "name": "Frijo", "image": null}
-    },
-    {
-      "id": 158,
-      "description": "LITERATURE BUSINESS DEVELOPMENT ASSOCIATE",
-      "image":
-          "https://i.ibb.co/wrzL7vr/Screenshot-2024-11-04-at-2-43-45-PM.png",
-      "video": "https://cdn.noviindus.com/3209829-hd_1280_720_25fps.mp4",
-      "user": {"id": 1, "name": "Frijo", "image": null}
-    },
-  ];
-
-  late List<Feed> feeds;
-
-  @override
-  void initState() {
-    super.initState();
-    feeds = feedJson.map((e) => Feed.fromJson(e)).toList();
-  }
+  final playingIndex = ValueNotifier<int?>(null);
+  final videoPlayerController = ValueNotifier<VideoPlayerController?>(null);
+  final chewieController = ValueNotifier<ChewieController?>(null);
 
   @override
   void dispose() {
     _disposeVideo();
+    playingIndex.dispose();
+    videoPlayerController.dispose();
+    chewieController.dispose();
     super.dispose();
   }
 
   void _disposeVideo() {
-    _chewieController?.dispose();
-    _videoPlayerController?.dispose();
-    _chewieController = null;
-    _videoPlayerController = null;
+    chewieController.value?.dispose();
+    videoPlayerController.value?.dispose();
+    chewieController.value = null;
+    videoPlayerController.value = null;
   }
 
-  Future<void> _playVideo(int index) async {
-    if (playingIndex == index) {
-      setState(() {
-        playingIndex = null;
-        _disposeVideo();
-      });
+  Future<void> _playVideo(int index, String videoUrl) async {
+    if (playingIndex.value == index) {
+      playingIndex.value = null;
+      _disposeVideo();
       return;
     }
 
     _disposeVideo();
 
-    final controller = VideoPlayerController.network(feeds[index].videoUrl);
+    final controller = VideoPlayerController.networkUrl(Uri.parse(videoUrl));
     await controller.initialize();
 
     final chewie = ChewieController(
@@ -148,146 +62,275 @@ class _HomeScreenState extends State<HomeScreen> {
       allowPlaybackSpeedChanging: true,
     );
 
-    setState(() {
-      playingIndex = index;
-      _videoPlayerController = controller;
-      _chewieController = chewie;
-    });
+    playingIndex.value = index;
+    videoPlayerController.value = controller;
+    chewieController.value = chewie;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      floatingActionButton: InkWell(
+        onTap: () => Navigator.pushNamed(context, AppRoute.addFeed),
+        child: Container(
+          height: 63.sdp,
+          width: 63.sdp,
+          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(style: BorderStyle.none), color: ColorResources.red),
+        child: Icon(Icons.add, size: 45.sdp, color: ColorResources.white,),
+        ),
+      ),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Categories Row
-            SizedBox(
-              height: 50,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: categories.length,
-                itemBuilder: (_, i) {
-                  return Chip(
-                    label: Text(categories[i]),
-                    backgroundColor: Colors.red,
-                    labelStyle: const TextStyle(color: Colors.white),
-                  );
-                },
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-              ),
-            ),
+        child: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            if (state is HomeBuildState) {
+              if (state.isLoading) {
+                return ListView.separated(
+                  padding: EdgeInsets.symmetric(horizontal: 17.sdp),
+                  itemBuilder: (context, index) => ShimmerLoader.rectangular(
+                    height: 40.sdp,
+                    width: double.maxFinite,
+                  ),
+                  separatorBuilder: (context, index) => SizedBox(height: 12.sdp),
+                  itemCount: 5,
+                );
+              }
+              if (state.isError) {
+                return ErrorMessage(message: state.errorMsg ?? "");
+              }
 
-            /// Feeds
-            Expanded(
-              child: ListView.builder(
-                itemCount: feeds.length,
-                itemBuilder: (context, index) {
-                  final feed = feeds[index];
-                  final isPlaying = playingIndex == index;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20.sdp),
+                  UserDetailsTile(user: state.homeFeeds?.user),
+                  SizedBox(height: 31.sdp),
+                  CategoriesTile(categories: state.homeFeeds?.categoryDict),
+                  SizedBox(height: 22.sdp),
+                  Expanded(
+                    child: ValueListenableBuilder<int?>(
+                      valueListenable: playingIndex,
+                      builder: (context, currentPlaying, _) {
+                        return ListView.builder(
+                          itemCount: state.homeFeeds?.results?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final feed = state.homeFeeds!.results![index];
+                            final isPlaying = currentPlaying == index;
 
-                  return VisibilityDetector(
-                    key: Key(feed.id.toString()),
-                    onVisibilityChanged: (info) {
-                      if (info.visibleFraction == 0 && playingIndex == index) {
-                        setState(() {
-                          playingIndex = null;
-                          _disposeVideo();
-                        });
-                      }
-                    },
-                    child: Card(
-                      margin: const EdgeInsets.all(12),
-                      color: Colors.grey[900],
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          /// Video or Thumbnail
-                          if (isPlaying &&
-                              _chewieController != null &&
-                              _videoPlayerController != null &&
-                              _videoPlayerController!.value.isInitialized)
-                            AspectRatio(
-                              aspectRatio:
-                                  _videoPlayerController!.value.aspectRatio,
-                              child: Chewie(controller: _chewieController!),
-                            )
-                          else
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: Image.network(
-                                    feed.thumbnail,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
-                                      color: Colors.grey,
-                                      child: const Icon(
-                                        Icons.image_not_supported,
-                                        color: Colors.white,
+                            return VisibilityDetector(
+                              key: Key(feed.id!.toString()),
+                              onVisibilityChanged: (info) {
+                                if (info.visibleFraction == 0 &&
+                                    playingIndex.value == index) {
+                                  playingIndex.value = null;
+                                  _disposeVideo();
+                                }
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 5.0.sdp),
+                                child: Container(
+                                  color: Colors.grey[900],
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 17.0.sdp,
+                                          top: 10.sdp,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            ClipRRect(
+                                              child: CachedNetworkImage(
+                                                imageUrl: "",
+                                                imageBuilder:
+                                                    (context, imageProvider) =>
+                                                        Container(
+                                                  height: 38.sdp,
+                                                  width: 38.sdp,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      image: imageProvider,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                                placeholder: (context, url) =>
+                                                    Container(
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color:
+                                                        ColorResources.greyHint,
+                                                  ),
+                                                  width: 38.sdp,
+                                                  height: 38.sdp,
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Container(
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color:
+                                                        ColorResources.greyHint,
+                                                  ),
+                                                ),
+                                                height: 38.sdp,
+                                                width: 38.sdp,
+                                              ),
+                                            ),
+                                            SizedBox(width: 12.sdp),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                TextWidget(
+                                                  text: feed.user?.name ??
+                                                      "Unknown",
+                                                  style: TextStyle(
+                                                    fontSize: 13.sdp,
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        context.dynamicColor(
+                                                      light:
+                                                          ColorResources.white,
+                                                      dark:
+                                                          ColorResources.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextWidget(
+                                                  text: "5 Days",
+                                                  style: TextStyle(
+                                                    fontSize: 10.sdp,
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        context.dynamicColor(
+                                                      light: ColorResources
+                                                          .greyTextHomeScreen,
+                                                      dark: ColorResources
+                                                          .greyTextHomeScreen,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.play_circle,
-                                    color: Colors.white,
-                                    size: 50,
-                                  ),
-                                  onPressed: () => _playVideo(index),
-                                ),
-                              ],
-                            ),
+                                      SizedBox(height: 17.sdp),
 
-                          /// User row
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 16,
-                                  backgroundImage: feed.userImage != null
-                                      ? NetworkImage(feed.userImage!)
-                                      : null,
-                                  child: feed.userImage == null
-                                      ? const Icon(Icons.person,
-                                          color: Colors.white)
-                                      : null,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  feed.userName,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                      ValueListenableBuilder<
+                                          VideoPlayerController?>(
+                                        valueListenable: videoPlayerController,
+                                        builder: (context, controller, _) {
+                                          if (isPlaying &&
+                                              controller != null &&
+                                              controller.value.isInitialized) {
+                                            return AspectRatio(
+                                              aspectRatio:
+                                                  controller.value.aspectRatio,
+                                              child: ValueListenableBuilder<
+                                                  ChewieController?>(
+                                                valueListenable:
+                                                    chewieController,
+                                                builder:
+                                                    (context, chewie, child) {
+                                                  return chewie != null
+                                                      ? Chewie(
+                                                          controller: chewie,
+                                                        )
+                                                      : const SizedBox();
+                                                },
+                                              ),
+                                            );
+                                          } else {
+                                            return Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                AspectRatio(
+                                                  aspectRatio: 16 / 9,
+                                                  child: Image.network(
+                                                    feed.image ?? "",
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder:
+                                                        (_, __, ___) =>
+                                                            Container(
+                                                      color: ColorResources.greyTextHomeScreen,
+                                                      child: const Icon(
+                                                        Icons
+                                                            .image_not_supported,
+                                                        color: ColorResources.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                InkWell(
+                                                  onTap: () => _playVideo(
+                                                      index, feed.video ?? ""),
+                                                  child: Container(
+                                                    height: 37.sdp,
+                                                    width: 37.sdp,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(
+                                                        width: 1.5.sdp,
+                                                        color: ColorResources
+                                                            .white,
+                                                      ),
+                                                      color: ColorResources
+                                                          .white
+                                                          .withOpacity(0.25),
+                                                    ),
+                                                    child: Center(
+                                                      child: Icon(
+                                                        Icons.play_arrow,
+                                                        color: ColorResources
+                                                            .white,
+                                                        size: 32.sdp,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }
+                                        },
+                                      ),
+
+                                      SizedBox(height: 10.sdp),
+                                      Padding(
+                                        padding: EdgeInsets.all(17.sdp),
+                                        child: TextWidget(
+                                          text: feed.description ?? "",
+                                          style: TextStyle(
+                                            fontSize: 12.5.sdp,
+                                            fontWeight: FontWeight.w300,
+                                            color: ColorResources
+                                                .greyTextHomeScreen,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-
-                          /// Description
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              feed.description,
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                          ),
-                        ],
-                      ),
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ],
+              );
+            }
+            return const SizedBox();
+          },
         ),
       ),
     );

@@ -90,10 +90,11 @@ class DioClient {
   ProgressCallback? onSendProgress,
   ProgressCallback? onReceiveProgress,
 }) async {
+  print("here in post -------------------");
   try {
     var response = await dio.post(
       uri,
-      data: data != null ? FormData.fromMap(data) : null, // 👈 wrap as FormData
+      data: data , 
       queryParameters: queryParameters,
       options: options,
       cancelToken: cancelToken,
@@ -122,6 +123,7 @@ class DioClient {
       print("----------$message");
       throw CustomException(errMsg: '$message'.capitalize);
     }
+    print("44444444444444444");
     rethrow;
   }
 }
@@ -199,11 +201,10 @@ class DioClient {
 
 
 class LoggingInterceptor extends InterceptorsWrapper {
-  Future<String?> _getToken() async {
-    final login = await LoginDataStore.getLogin();
-    return login?.token;
-
-  }
+ Future<String?> _getToken() async {
+  final login = await LoginDataStore.getLogin();
+  return login?.token?.access; // ✅ safe null check
+}
 
   @override
   Future onRequest(
