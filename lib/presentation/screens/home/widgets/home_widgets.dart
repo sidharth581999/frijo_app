@@ -10,10 +10,11 @@ import 'package:frijo/presentation/widgets/common_button.dart';
 class CategoriesTile extends StatelessWidget {
   const CategoriesTile({
     super.key,
-    required this.categories,
+    required this.categories, required this.selCategory
   });
 
   final List<CategoryDict>? categories;
+  final ValueNotifier<String?> selCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +28,23 @@ class CategoriesTile extends StatelessWidget {
           return CommonButton(
             isBoarder: true,
             borderRadious: 16,
-            boarderColor: ColorResources.white.withOpacity(0.4),
-            buttoncolor: ColorResources.blackBG, onTap: (){}, height: null, 
+            
+            boarderColor: selCategory.value == categories?[i].id? ColorResources.red.withOpacity(0.4) : ColorResources.white.withOpacity(0.4),
+            buttoncolor: selCategory.value == categories?[i].id? ColorResources.red.withOpacity(0.2) : ColorResources.blackBG, onTap: (){
+              selCategory.value = categories?[i].id;
+            }, height: null, 
           width: null, child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 15.sdp, vertical:8.sdp),
-            child: TextWidget(text: categories?[i].title??"Title not avilable", style: TextStyle(
-                    fontSize: 12.sdp,
-                    fontWeight: FontWeight.w400,
-                    color: context.dynamicColor(light: ColorResources.white, dark: ColorResources.white)),),
+            child: Row(
+              children: [
+                selCategory.value == categories?[i].id? Image.asset("assets/ankr.png", color: ColorResources.white,) : SizedBox(),
+                selCategory.value == categories?[i].id? SizedBox(width: 6.sdp,) : SizedBox(),
+                TextWidget(text: categories?[i].title??"Title not avilable", style: TextStyle(
+                        fontSize: 12.sdp,
+                        fontWeight: FontWeight.w400,
+                        color: context.dynamicColor(light: ColorResources.white, dark: ColorResources.white)),),
+              ],
+            ),
           ));
         },
         separatorBuilder: (_, __) => SizedBox(width: 12.sdp),

@@ -9,261 +9,45 @@ CategoryListModel CategoryListModelFromJson(String str) => CategoryListModel.fro
 String CategoryListModelToJson(CategoryListModel data) => json.encode(data.toJson());
 
 class CategoryListModel {
-    final bool? status;
-    final String? message;
-    final List<Patient>? patient;
+    List<Category>? categories;
+    bool? status;
 
     CategoryListModel({
+        this.categories,
         this.status,
-        this.message,
-        this.patient,
     });
 
     factory CategoryListModel.fromJson(Map<String, dynamic> json) => CategoryListModel(
+        categories: json["categories"] == null ? [] : List<Category>.from(json["categories"]!.map((x) => Category.fromJson(x))),
         status: json["status"],
-        message: json["message"],
-        patient: json["patient"] == null ? [] : List<Patient>.from(json["patient"]!.map((x) => Patient.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
+        "categories": categories == null ? [] : List<dynamic>.from(categories!.map((x) => x.toJson())),
         "status": status,
-        "message": message,
-        "patient": patient == null ? [] : List<dynamic>.from(patient!.map((x) => x.toJson())),
     };
 }
 
-class Patient {
-    final int? id;
-    final List<PatientdetailsSet>? patientdetailsSet;
-    final Branch? branch;
-    final String? user;
-    final String? payment;
-    final String? name;
-    final String? phone;
-    final String? address;
-    final dynamic price;
-    final int? totalAmount;
-    final int? discountAmount;
-    final int? advanceAmount;
-    final int? balanceAmount;
-    final DateTime? dateNdTime;
-    final bool? isActive;
-    final DateTime? createdAt;
-    final DateTime? updatedAt;
+class Category {
+    int? id;
+    String? title;
+    String? image;
 
-    Patient({
+    Category({
         this.id,
-        this.patientdetailsSet,
-        this.branch,
-        this.user,
-        this.payment,
-        this.name,
-        this.phone,
-        this.address,
-        this.price,
-        this.totalAmount,
-        this.discountAmount,
-        this.advanceAmount,
-        this.balanceAmount,
-        this.dateNdTime,
-        this.isActive,
-        this.createdAt,
-        this.updatedAt,
+        this.title,
+        this.image,
     });
 
-    factory Patient.fromJson(Map<String, dynamic> json) => Patient(
+    factory Category.fromJson(Map<String, dynamic> json) => Category(
         id: json["id"],
-        patientdetailsSet: json["patientdetails_set"] == null ? [] : List<PatientdetailsSet>.from(json["patientdetails_set"]!.map((x) => PatientdetailsSet.fromJson(x))),
-        branch: json["branch"] == null ? null : Branch.fromJson(json["branch"]),
-        user: json["user"],
-        payment: json["payment"],
-        name: json["name"],
-        phone: json["phone"],
-        address: json["address"],
-        price: json["price"],
-        totalAmount: json["total_amount"],
-        discountAmount: json["discount_amount"],
-        advanceAmount: json["advance_amount"],
-        balanceAmount: json["balance_amount"],
-        dateNdTime: json["date_nd_time"] == null ? null : DateTime.parse(json["date_nd_time"]),
-        isActive: json["is_active"],
-        createdAt: json["created_at"] == null ? null : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null ? null : DateTime.parse(json["updated_at"]),
+        title: json["title"],
+        image: json["image"],
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "patientdetails_set": patientdetailsSet == null ? [] : List<dynamic>.from(patientdetailsSet!.map((x) => x.toJson())),
-        "branch": branch?.toJson(),
-        "user": user,
-        "payment": payment,
-        "name": name,
-        "phone": phone,
-        "address": address,
-        "price": price,
-        "total_amount": totalAmount,
-        "discount_amount": discountAmount,
-        "advance_amount": advanceAmount,
-        "balance_amount": balanceAmount,
-        "date_nd_time": dateNdTime?.toIso8601String(),
-        "is_active": isActive,
-        "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
+        "title": title,
+        "image": image,
     };
-}
-
-class Branch {
-    final int? id;
-    final Name? name;
-    final int? patientsCount;
-    final Location? location;
-    final Phone? phone;
-    final Mail? mail;
-    final Address? address;
-    final String? gst;
-    final bool? isActive;
-
-    Branch({
-        this.id,
-        this.name,
-        this.patientsCount,
-        this.location,
-        this.phone,
-        this.mail,
-        this.address,
-        this.gst,
-        this.isActive,
-    });
-
-    factory Branch.fromJson(Map<String, dynamic> json) => Branch(
-        id: json["id"],
-        name: nameValues.map[json["name"]]!,
-        patientsCount: json["patients_count"],
-        location: locationValues.map[json["location"]]!,
-        phone: phoneValues.map[json["phone"]]!,
-        mail: mailValues.map[json["mail"]]!,
-        address: addressValues.map[json["address"]]!,
-        gst: json["gst"],
-        isActive: json["is_active"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": nameValues.reverse[name],
-        "patients_count": patientsCount,
-        "location": locationValues.reverse[location],
-        "phone": phoneValues.reverse[phone],
-        "mail": mailValues.reverse[mail],
-        "address": addressValues.reverse[address],
-        "gst": gst,
-        "is_active": isActive,
-    };
-}
-
-enum Address {
-    KOCHI_KERALA_685565,
-    KOTTAYAM_KERALA_6865636,
-    KOZHIKODE
-}
-
-final addressValues = EnumValues({
-    "Kochi, Kerala-685565": Address.KOCHI_KERALA_685565,
-    "Kottayam, Kerala-6865636": Address.KOTTAYAM_KERALA_6865636,
-    "Kozhikode": Address.KOZHIKODE
-});
-
-enum Location {
-    KOCHI_KERALA,
-    KOZHIKODE,
-    KUMARAKOM
-}
-
-final locationValues = EnumValues({
-    "Kochi,kerala": Location.KOCHI_KERALA,
-    "Kozhikode": Location.KOZHIKODE,
-    "Kumarakom": Location.KUMARAKOM
-});
-
-enum Mail {
-    USER123_GMAIL_COM,
-    USER123_GMAIL_COMM
-}
-
-final mailValues = EnumValues({
-    "user123@gmail.com": Mail.USER123_GMAIL_COM,
-    "user123@gmail.comm": Mail.USER123_GMAIL_COMM
-});
-
-enum Name {
-    EDAPPALI,
-    KUMARAKOM,
-    NADAKKAVU,
-    THONDAYADU
-}
-
-final nameValues = EnumValues({
-    "Edappali": Name.EDAPPALI,
-    "KUMARAKOM": Name.KUMARAKOM,
-    "Nadakkavu": Name.NADAKKAVU,
-    "Thondayadu": Name.THONDAYADU
-});
-
-enum Phone {
-    THE_9846123456,
-    THE_9946331452,
-    THE_99463314529747331452
-}
-
-final phoneValues = EnumValues({
-    "9846123456": Phone.THE_9846123456,
-    "9946331452, ": Phone.THE_9946331452,
-    "9946331452,9747331452": Phone.THE_99463314529747331452
-});
-
-class PatientdetailsSet {
-    final int? id;
-    final String? male;
-    final String? female;
-    final int? patient;
-    final int? treatment;
-    final String? treatmentName;
-
-    PatientdetailsSet({
-        this.id,
-        this.male,
-        this.female,
-        this.patient,
-        this.treatment,
-        this.treatmentName,
-    });
-
-    factory PatientdetailsSet.fromJson(Map<String, dynamic> json) => PatientdetailsSet(
-        id: json["id"],
-        male: json["male"],
-        female: json["female"],
-        patient: json["patient"],
-        treatment: json["treatment"],
-        treatmentName: json["treatment_name"],
-    );
-
-    Map<String, dynamic> toJson() => {
-        "id": id,
-        "male": male,
-        "female": female,
-        "patient": patient,
-        "treatment": treatment,
-        "treatment_name": treatmentName,
-    };
-}
-
-class EnumValues<T> {
-    Map<String, T> map;
-    late Map<T, String> reverseMap;
-
-    EnumValues(this.map);
-
-    Map<T, String> get reverse {
-            reverseMap = map.map((k, v) => MapEntry(v, k));
-            return reverseMap;
-    }
 }

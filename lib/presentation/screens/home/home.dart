@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frijo/application/core/route/app_route.dart';
 import 'package:frijo/application/core/theme/colors.dart';
+import 'package:frijo/application/core/utils/date_checker.dart';
 import 'package:frijo/application/core/utils/extentions.dart';
 import 'package:frijo/application/core/utils/text_widget.dart';
+import 'package:frijo/presentation/bloc/buildFeed/addfeed_bloc.dart';
 import 'package:frijo/presentation/bloc/homeBloc/home_bloc.dart';
 import 'package:frijo/presentation/screens/home/widgets/home_widgets.dart';
 import 'package:frijo/presentation/widgets/error_widget.dart';
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final playingIndex = ValueNotifier<int?>(null);
   final videoPlayerController = ValueNotifier<VideoPlayerController?>(null);
   final chewieController = ValueNotifier<ChewieController?>(null);
+  final selecetdCategory = ValueNotifier<String?>(null);
 
   @override
   void dispose() {
@@ -71,7 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: InkWell(
-        onTap: () => Navigator.pushNamed(context, AppRoute.addFeed),
+        onTap: () { 
+          context.read<AddFeedBloc>().add(
+                          CategoryBuildEvent()
+                        );
+          Navigator.pushNamed(context, AppRoute.addFeed);},
         child: Container(
           height: 63.sdp,
           width: 63.sdp,
@@ -104,7 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 20.sdp),
                   UserDetailsTile(user: state.homeFeeds?.user),
                   SizedBox(height: 31.sdp),
-                  CategoriesTile(categories: state.homeFeeds?.categoryDict),
+                  ValueListenableBuilder(
+                    valueListenable: selecetdCategory,
+                    builder: (context, value, child) {
+                      return CategoriesTile(categories: state.homeFeeds?.categoryDict, selCategory: selecetdCategory,);
+                    }
+                  ),
                   SizedBox(height: 22.sdp),
                   Expanded(
                     child: ValueListenableBuilder<int?>(
@@ -205,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   ),
                                                 ),
                                                 TextWidget(
-                                                  text: "5 Days",
+                                                  text: timeAgoOrToday(feed.createdAt),
                                                   style: TextStyle(
                                                     fontSize: 10.sdp,
                                                     fontWeight: FontWeight.w400,

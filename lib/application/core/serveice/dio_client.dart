@@ -83,7 +83,7 @@ class DioClient {
 
   Future<Response> post(
   String uri, {
-  Map<String, dynamic>? data,
+  dynamic data,//Map<String, dynamic>?
   Map<String, dynamic>? queryParameters,
   Options? options,
   CancelToken? cancelToken,
@@ -226,6 +226,10 @@ class LoggingInterceptor extends InterceptorsWrapper {
               : 0,
     });
 
+    // if (!(options.data is FormData)) {
+    //   options.headers['Content-Type'] = 'application/json; charset=UTF-8';
+    // }
+
     Logger.logWarning("Headers: ${options.headers.toString()}");
     Logger.logWarning("Parms: ${options.data.toString()}");
     return super.onRequest(options, handler);
@@ -262,81 +266,6 @@ class LoggingInterceptor extends InterceptorsWrapper {
   }
 }
 
-
-// class LoggingInterceptor extends InterceptorsWrapper {
-//   @override
-//   Future onRequest(
-//       RequestOptions options, RequestInterceptorHandler handler) async {
-//     DateTime now = DateTime.now().toUtc();
-//     // String? token = box.read(AppConstants.token);
-//     options.headers.addAll({
-//       'Timestamp': now.millisecondsSinceEpoch,
-//       'Content-Type': 'application/json; charset=UTF-8',
-//       'Authorization': 'Bearer ',
-//       'Access-Control-Allow-Origin': '*',
-//       'Accept': 'application/json',
-//       'Device-Type': Platform.isAndroid
-//           ? 1
-//           : Platform.isIOS
-//               ? 2
-//               : 0,
-//       // 'Device-Token': AppConstants.fcmToken ?? "",
-//       // 'Language': di.sl<LanguageBloc>().locale.languageCode,
-//       // 'User-Agent': AppConstants.userAgent ?? {}
-//     });
-
-//     Logger.logWarning("Headers: ${options.headers.toString()}");
-//     Logger.logWarning("Parms: ${options.data.toString()}");
-//     return super.onRequest(options, handler);
-//   }
-
-//   @override
-//   Future onResponse(
-//       Response response, ResponseInterceptorHandler handler) async {
-//     try {
-//       if (response.statusCode == 201) {
-//         return super.onResponse(response, handler);
-//       } else if (response.data['status'] == true) {
-//         return response.data['status'] == true
-//             ? super.onResponse(response, handler)
-//             : handler.reject(
-//                 DioException(
-//                   requestOptions: response.requestOptions,
-//                   error: response.data,
-//                   response: response,
-//                   type: DioExceptionType.unknown,
-//                 ),
-//               );
-//         //newly added else
-//       } else {
-//         return response.data['status'] == true
-//             ? super.onResponse(response, handler)
-//             : handler.reject(
-//                 DioException(
-//                   requestOptions: response.requestOptions,
-//                   error: response.data,
-//                   response: response,
-//                   type: DioExceptionType.unknown,
-//                 ),
-//               );
-//       }
-//     } catch (e) {
-//       handler.reject(
-//         DioException(
-//           requestOptions: response.requestOptions,
-//           error: "Something went wrong",
-//           response: response,
-//           type: DioExceptionType.unknown,
-//         ),
-//       );
-//     }
-//   }
-
-//   @override
-//   Future onError(DioException err, ErrorInterceptorHandler handler) async {
-//     return super.onError(err, handler);
-//   }
-// }
 
 class InternetConnectionInterceptor extends Interceptor {
   @override

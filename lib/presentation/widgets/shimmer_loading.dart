@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frijo/application/core/theme/colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerLoader extends StatelessWidget {
@@ -23,14 +24,14 @@ class ShimmerLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: ColorResources.darkGrey,
+      highlightColor: ColorResources.greyHint,
       period: const Duration(milliseconds: 1200),
       child: Container(
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
+          color: ColorResources.darkGrey,
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),

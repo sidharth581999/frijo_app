@@ -65,7 +65,7 @@ class HelperService {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.0),
                     color: type == 'normal'
-                        ? ColorResources.white
+                        ? ColorResources.darkGrey
                         : ColorResources.red),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

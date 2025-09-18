@@ -10,4 +10,5 @@ class ColorResources {
   static const greyHint = Color(0xFFBDBDBD);
   static const textBlue = Color(0xFF0028FC);
   static const greyTextHomeScreen = Color(0xFFD5D5D5);
+  static const darkGrey = Color(0xFF515151);
 }

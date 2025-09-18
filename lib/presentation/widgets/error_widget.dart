@@ -14,7 +14,7 @@ class ErrorMessage extends StatelessWidget {
     required this.message,
     this.width = double.infinity,
     this.height = 60,
-    this.bgColor = ColorResources.white,
+    this.bgColor = ColorResources.blackBG,
     this.textColor = ColorResources.greyTextloginScreen,
     this.icon = Icons.error_outline,
   }) : super(key: key);

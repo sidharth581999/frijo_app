@@ -37,6 +37,7 @@ class CommonTextFormField extends StatelessWidget {
     return SizedBox(
       height: height,
       child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUnfocus,
         keyboardType: keybordType ?? TextInputType.text,
         onTap: onTap,
         readOnly: isReadonly?? false,

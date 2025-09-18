@@ -16,8 +16,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(HomeBuildState(isLoading: true, isError: false, isSuccess: false, homeFeeds: null));
     final getHomeFeeds = GetHomeData.defaultRepo();
     final response = await getHomeFeeds.getHomeFeeds();
-    print("--------------------------------ttttttttttttt");
-print(response);
     emit(
       response.fold(
         (l) => HomeBuildState(isLoading: false, isError: true, isSuccess: false, homeFeeds: null, errorMsg: l.errorMsg), 

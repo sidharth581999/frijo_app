@@ -16,6 +16,7 @@ class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
   TextEditingController phoneController = TextEditingController();
+   final _formKey = GlobalKey<FormState>();
   String countryCode = "+91";
 
   @override
@@ -30,25 +31,10 @@ class LoginScreen extends StatelessWidget {
             dark: ColorResources.blackBG,
           ),
           child: SingleChildScrollView(
-            child: BlocListener<LoginBloc, LoginState>(
-              listener: (context, state) {
-                if (state is LoginClickedState) {
-                  if (state.isError) {
-                    HelperService.showCustomToast(
-                      message: state.errorMsg ?? "",
-                      type: "error",
-                    );
-                  } else if (state.isSuccess) {
-                    HelperService.showCustomToast(
-                      message: "Successfully Logedin",
-                    );
-                    context.read<HomeBloc>().add(HomeBuildEvent());
-                    // Navigator.pushReplacementNamed(context, AppRoute.home);
-                  }
-                }
-              },
-              child: Padding(
-                padding: EdgeInsets.all(16.sdp),
+            child: Padding(
+              padding: EdgeInsets.all(16.sdp),
+              child: Form(
+                key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,7 +78,13 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(width: 10.sdp),
                         Expanded(
                           child: CommonTextFormField(
+                            keybordType: TextInputType.number,
                             controller: phoneController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "field can't be empty";
+                              } return null;
+                            },
                             hintText: "Enter Mobile Number",
                           ),
                         ),
@@ -103,8 +95,14 @@ class LoginScreen extends StatelessWidget {
                       child: BlocConsumer<LoginBloc, LoginState>(
                         listener: (context, state) {
                           if (state is LoginClickedState && state.isError) {
-                            
+                            HelperService.showCustomToast(
+                      message: state.errorMsg ?? "",
+                      type: "error",
+                    );
                           } else if(state is LoginClickedState && state.isSuccess) {
+                            HelperService.showCustomToast(
+                      message: "successfully logedin",
+                    );
                               context.read<HomeBloc>().add(
                           HomeBuildEvent()
                         );
@@ -123,10 +121,12 @@ class LoginScreen extends StatelessWidget {
                             ),
                             boarderColor: ColorResources.white.withOpacity(0.6),
                             onTap: () {
-                              if (state is LoginClickedState && state.isLoading) { } else{
+                              if (_formKey.currentState!.validate()) {
+                                if (state is LoginClickedState && state.isLoading) { } else{
                                  context.read<LoginBloc>().add(
                           LoginClickedEvent(countryCode: countryCode, phoneNo: phoneController.text)
                         );
+                              }
                               }
                               
                             },

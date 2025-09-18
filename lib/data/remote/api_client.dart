@@ -6,6 +6,7 @@ import 'package:frijo/data/models/login_model.dart';
 import 'package:frijo/data/models/category_model.dart';
 import 'package:frijo/data/models/treatment_model.dart';
 import 'package:frijo/domain/core/exception/custom_exception.dart';
+import 'package:frijo/presentation/bloc/shareFeed/share_feed_bloc.dart';
 
 class ApiClient {
   
@@ -57,11 +58,24 @@ static Future<HomeDataModel> getHomeDataApi() async {
   }
 
 
-  //get my feed
-static Future<MyFeedModel> addMyFeedApi() async {
+  //add my feed
+static Future<MyFeedModel> addMyFeedApi(ShareFeedModel feed) async {
+  final formData = FormData.fromMap({
+        "desc": feed.desc,
+        "category": feed.categories,
+        "video": await MultipartFile.fromFile(
+          feed.video,
+          // filename: "video.mp4",
+        ),
+        "image": await MultipartFile.fromFile(
+          feed.image,
+          // filename: "thumbnail.jpg",
+        ),
+      });
     try {
-      final response = await _dioClient.get(
+      final response = await _dioClient.post(
         '/my_feed',
+        data: formData
       );
       return MyFeedModel.fromJson(response.data);
     } catch (e) {

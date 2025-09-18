@@ -5,8 +5,10 @@ import 'package:frijo/application/core/theme/app_theme.dart';
 import 'package:frijo/application/core/utils/device_size.dart';
 import 'package:frijo/application/core/utils/enums.dart';
 import 'package:frijo/application/core/utils/toast.dart';
+import 'package:frijo/presentation/bloc/buildFeed/addfeed_bloc.dart';
 import 'package:frijo/presentation/bloc/homeBloc/home_bloc.dart';
 import 'package:frijo/presentation/bloc/loginBloc/login_bloc.dart';
+import 'package:frijo/presentation/bloc/shareFeed/share_feed_bloc.dart';
 import 'package:frijo/presentation/bloc/theme_cubit.dart';
 
 
@@ -33,6 +35,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<HomeBloc>(
           create: (_) => HomeBloc(),
+        ),
+        BlocProvider<AddFeedBloc>(
+          create: (_) => AddFeedBloc(),
+        ),
+        BlocProvider<ShareFeedBloc>(
+          create: (_) => ShareFeedBloc(),
         ),
       ],
       child: BlocBuilder<ThemeCubit, AppThemeMode>(
