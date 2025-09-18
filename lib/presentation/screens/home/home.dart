@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           children: [
                                             ClipRRect(
                                               child: CachedNetworkImage(
-                                                imageUrl: "",
+                                                imageUrl: feed.user?.image??"",
                                                 imageBuilder:
                                                     (context, imageProvider) =>
                                                         Container(
@@ -188,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     color:
                                                         ColorResources.greyHint,
                                                   ),
+                                                  child: Center(child: Icon(Icons.person_2, size: 20.sdp, color: ColorResources.blackBG,),),
                                                 ),
                                                 height: 38.sdp,
                                                 width: 38.sdp,

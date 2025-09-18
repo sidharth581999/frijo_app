@@ -72,7 +72,7 @@ class UserDetailsTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextWidget(
-                text: "Hello ${user?.name?? ""}",
+                text: "Hello ${user?.name?? "Sidharth"}",
                 style: TextStyle(
                   fontSize: 16.sdp,
                   fontWeight: FontWeight.w600,

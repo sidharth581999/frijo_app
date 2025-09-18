@@ -23,6 +23,7 @@ class AddFeedsScreen extends StatelessWidget {
   final ValueNotifier<ChewieController?> chewieController =
       ValueNotifier<ChewieController?>(null);
   final ValueNotifier<bool> isVideoPlaying = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> showAll = ValueNotifier<bool>(false);
 
   final TextEditingController descriptionController = TextEditingController();
 
@@ -70,61 +71,6 @@ class AddFeedsScreen extends StatelessWidget {
     videoPlayerController.value = controller;
     chewieController.value = chewie;
   }
-
-  // /// API call to share feed
-  // Future<void> _shareFeed(BuildContext context) async {
-  //   if (videoFile.value == null ||
-  //       thumbnailFile.value == null ||
-  //       descriptionController.text.isEmpty ||
-  //       selectedCategories.value.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text("Please complete all fields")),
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     final dio = Dio();
-  //     final formData = FormData.fromMap({
-  //       "description": descriptionController.text,
-  //       "categories": selectedCategories.value, // list of strings
-  //       "video": await MultipartFile.fromFile(
-  //         videoFile.value!.path,
-  //         filename: "video.mp4",
-  //       ),
-  //       "thumbnail": await MultipartFile.fromFile(
-  //         thumbnailFile.value!.path,
-  //         filename: "thumbnail.jpg",
-  //       ),
-  //     });
-
-  //     final response = await dio.post(
-  //       "https://yourapi.com/feeds/", // 🔹 Replace with your API
-  //       data: formData,
-  //       options: Options(
-  //         headers: {
-  //           "Content-Type": "multipart/form-data",
-  //           "Authorization": "Bearer YOUR_TOKEN", // 🔹 add auth if needed
-  //         },
-  //       ),
-  //     );
-
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text("Feed shared successfully")),
-  //       );
-  //       Navigator.of(context).pop(); // go back after success
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text("Failed: ${response.statusMessage}")),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text("Error: $e")));
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -294,33 +240,42 @@ class AddFeedsScreen extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        Row(
-                          children: [
-                            TextWidget(
-                              text: "View All",
-                              style: TextStyle(
-                                color: ColorResources.white,
-                                fontSize: 10.sdp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(width: 5.sdp),
-                            Container(
-                              height: 10.4.sdp,
-                              width: 10.4.sdp,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: ColorResources.white),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 6.sdp,
-                                  color: ColorResources.white,
+                        ValueListenableBuilder(
+                          valueListenable: showAll,
+                          builder: (context, value, child) => 
+                          InkWell(
+                            onTap: () {
+                              showAll.value = !showAll.value;  
+                            },
+                            child: Row(
+                              children: [
+                                TextWidget(
+                                  text: showAll.value? "View Less" : "View All",
+                                  style: TextStyle(
+                                    color: ColorResources.white,
+                                    fontSize: 10.sdp,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
+                                SizedBox(width: 5.sdp),
+                                Container(
+                                  height: 10.4.sdp,
+                                  width: 10.4.sdp,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: ColorResources.white),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 6.sdp,
+                                      color: ColorResources.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -329,63 +284,71 @@ class AddFeedsScreen extends StatelessWidget {
                     BlocBuilder<AddFeedBloc, AddFeedState>(
                       builder: (context, state) {
                         if (state is AddFeedBuildState && state.isSuccess) {
-                          return ValueListenableBuilder<List<int>>(
-                            valueListenable: selectedCategories,
-                            builder: (context, selected, _) {
-                              return state.categories?.categories != null
-                                  ? Wrap(
-                                      spacing: 10.sdp,
-                                      runSpacing: 10.sdp,
-                                      children: state.categories!.categories!
-                                          .map((cat) {
-                                            final isSelected = selected
-                                                .contains(cat.id);
-                                            return GestureDetector(
-                                              onTap: () {
-                                                if (isSelected) {
-                                                  selectedCategories.value =
-                                                      List.from(selected)
-                                                        ..remove(cat.id);
-                                                } else {
-                                                  selectedCategories.value =
-                                                      List.from(selected)
-                                                        ..add(cat.id!);
-                                                }
-                                              },
-                                              child: Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 10.sdp,
-                                                  vertical: 9.sdp,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        15.7.sdp,
-                                                      ),
-                                                  border: Border.all(
-                                                    color: ColorResources.red
-                                                        .withOpacity(0.4),
+                          return ValueListenableBuilder(
+                            valueListenable: showAll,
+                            builder: (context, value, child) => 
+                             ValueListenableBuilder<List<int>>(
+                              valueListenable: selectedCategories,
+                              builder: (context, selected, _) {
+                                final categories = state.categories?.categories ?? [];
+                                                    final visibleCategories = showAll.value
+                            ? categories
+                                                   : categories.take(6).toList();
+                                return state.categories?.categories != null
+                                    ? Wrap(
+                                        spacing: 10.sdp,
+                                        runSpacing: 10.sdp,
+                                        children: visibleCategories
+                                            .map((cat) {
+                                              final isSelected = selected
+                                                  .contains(cat.id);
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  if (isSelected) {
+                                                    selectedCategories.value =
+                                                        List.from(selected)
+                                                          ..remove(cat.id);
+                                                  } else {
+                                                    selectedCategories.value =
+                                                        List.from(selected)
+                                                          ..add(cat.id!);
+                                                  }
+                                                },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 10.sdp,
+                                                    vertical: 9.sdp,
                                                   ),
-                                                  color: isSelected
-                                                      ? ColorResources.red
-                                                            .withOpacity(0.3)
-                                                      : null,
-                                                ),
-                                                child: TextWidget(
-                                                  text: cat.title,
-                                                  style: TextStyle(
-                                                    color: ColorResources.white,
-                                                    fontSize: 10.sdp,
-                                                    fontWeight: FontWeight.w400,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          15.7.sdp,
+                                                        ),
+                                                    border: Border.all(
+                                                      color: ColorResources.red
+                                                          .withOpacity(0.4),
+                                                    ),
+                                                    color: isSelected
+                                                        ? ColorResources.red
+                                                              .withOpacity(0.3)
+                                                        : null,
+                                                  ),
+                                                  child: TextWidget(
+                                                    text: cat.title,
+                                                    style: TextStyle(
+                                                      color: ColorResources.white,
+                                                      fontSize: 10.sdp,
+                                                      fontWeight: FontWeight.w400,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            );
-                                          })
-                                          .toList(),
-                                    )
-                                  : SizedBox();
-                            },
+                                              );
+                                            })
+                                            .toList(),
+                                      )
+                                    : SizedBox();
+                              },
+                            ),
                           );
                         } else {
                           return SizedBox();

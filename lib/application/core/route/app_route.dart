@@ -10,20 +10,15 @@ import 'package:page_transition/page_transition.dart';
 
 
 class AppRoute {
-  // Define all route names here
   static const String splash = '/splash';
   static const String addFeed = '/add_feed';
   static const String login = '/login';
   static const String home = '/home';
-  // static const String register = '/register';
-  // static const String pdfScreen = '/pdfScreen';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     Logger.logWarning(
       'Route Name: ${settings.name},  Arguments: ${settings.arguments}, ArgumentType: ${settings.arguments.runtimeType}',
     );
-
-    // final arguments = settings.arguments as Map<String, dynamic>?;
 
     switch (settings.name) {
       case splash:
